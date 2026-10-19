@@ -8,50 +8,70 @@
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             margin: 0;
-            padding: 20px;
+            padding: 10px;
             background: linear-gradient(135deg, #1a2a6c, #b21f1f, #fdbb2d);
-            min-height: 100vh;
+            box-sizing: border-box;
             display: flex;
             justify-content: center;
-            align-items: center;
+            align-items: flex-start;
         }
         .calculator {
+            box-sizing: border-box;
             max-width: 500px;
             width: 100%;
             background: rgba(255,255,255,0.95);
             backdrop-filter: blur(10px);
             border-radius: 20px;
             box-shadow: 0 20px 40px rgba(0,0,0,0.3);
-            padding: 30px;
+            padding: 16px 18px;
             color: #333;
         }
         h1 {
             text-align: center;
             margin-top: 0;
+            margin-bottom: 4px;
             color: #1a2a6c;
-            font-size: 1.8rem;
+            font-size: 1.5rem;
         }
         .subtitle {
             text-align: center;
-            margin-bottom: 25px;
+            margin: 0 0 12px;
             color: #555;
-            font-size: 0.95rem;
+            font-size: 0.9rem;
         }
         .input-group {
-            margin-bottom: 18px;
+            margin-bottom: 8px;
+        }
+        .grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            column-gap: 10px;
+        }
+        .grid .input-group label {
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        h3.section {
+            margin: 6px 0 6px;
+            color: #666;
+            font-size: 1rem;
+        }
+        @media (max-width: 300px) {
+            .grid { grid-template-columns: 1fr; }
         }
         label {
             display: block;
             font-weight: 600;
-            margin-bottom: 4px;
-            font-size: 0.9rem;
+            margin-bottom: 2px;
+            font-size: 0.85rem;
         }
         .currency-input {
             position: relative;
         }
         .currency-input span.currency {
             position: absolute;
-            left: 12px;
+            left: 10px;
             top: 50%;
             transform: translateY(-50%);
             color: #666;
@@ -60,7 +80,7 @@
         }
         input[type="number"] {
             width: 100%;
-            padding: 12px 12px 12px 35px;
+            padding: 8px 8px 8px 28px;
             border: 1px solid #ccc;
             border-radius: 8px;
             font-size: 1rem;
@@ -73,7 +93,7 @@
             box-shadow: 0 0 0 2px rgba(178,31,31,0.2);
         }
         .optional-toggle {
-            margin: 20px 0;
+            margin: 6px 0;
             text-align: left;
             font-size: 0.9rem;
         }
@@ -82,15 +102,15 @@
             cursor: pointer;
         }
         .results {
-            margin-top: 25px;
+            margin-top: 10px;
             background: #f9f9f9;
             border-radius: 12px;
-            padding: 20px;
+            padding: 12px;
             text-align: center;
             font-weight: 600;
         }
         .savings {
-            font-size: 2rem;
+            font-size: 1.6rem;
             color: #1a2a6c;
         }
         .savings.positive {
@@ -102,7 +122,8 @@
         .btn {
             display: inline-block;
             margin-top: 10px;
-            padding: 12px 25px;
+            width: 100%;
+            padding: 11px 25px;
             background: #b21f1f;
             color: white;
             border: none;
@@ -114,9 +135,10 @@
         }
         .btn:hover {
             background: #8e0000;
+        }
         .book-btn {
             display: none;
-            margin-top: 15px;
+            margin-top: 8px;
             padding: 12px 25px;
             background: #f5a623;
             color: #ffffff;
@@ -132,7 +154,7 @@
         .details {
             font-size: 0.9rem;
             color: #555;
-            margin-top: 10px;
+            margin-top: 6px;
         }
         .advanced {
             margin-top: 10px;
@@ -147,6 +169,7 @@
         <h1>Executive Lounge Value</h1>
         <p class="subtitle">Compare costs: Standard Room + Amenities vs. Executive Room</p>
         
+        <div class="grid">
         <div class="input-group">
             <label for="stdRoom">Standard Room Price</label>
             <div class="currency-input">
@@ -163,7 +186,10 @@
             </div>
         </div>
         
-        <h3 style="margin-bottom:10px; color:#666;">Amenity Costs (per night)</h3>
+        </div>
+        
+        <h3 class="section">Amenity Costs (per night)</h3>
+        <div class="grid">
         
         <div class="input-group">
             <label for="breakfast">Breakfast</label>
@@ -229,12 +255,14 @@
             </div>
         </div>
         
+        </div>
+        
         <div class="optional-toggle">
             <input type="checkbox" id="showAdvanced" onchange="toggleAdvanced()">
             <label for="showAdvanced">Add more variables</label>
         </div>
         
-        <div id="advancedFields" class="hidden">
+        <div id="advancedFields" class="hidden grid">
             <div class="input-group">
                 <label for="other1">Other Amenity 1</label>
                 <div class="currency-input">
@@ -313,7 +341,17 @@
         function toggleAdvanced() {
             const adv = document.getElementById('advancedFields');
             adv.classList.toggle('hidden');
+            reportHeight();
         }
+        // Report document height to the parent page (harmless if nobody listens)
+        function reportHeight() {
+            if (window.parent === window) return;
+            const h = document.documentElement.scrollHeight;
+            window.parent.postMessage({type: 'cra-calculator-height', height: h}, '*');
+        }
+        window.addEventListener('load', reportHeight);
+        window.addEventListener('resize', reportHeight);
+        if (window.ResizeObserver) new ResizeObserver(reportHeight).observe(document.body);
     </script>
 </body>
 </html>
